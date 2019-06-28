@@ -1,0 +1,286 @@
+---
+title: "Venture Capital Images"
+output: html_notebook
+---
+
+
+**Key takeaways:**  
+
+*  **Venture Capital Investment in Louisville has increased dramatically in the last two years.**
+*  **Louisville is roughly average for per capita VC investment over the timeframe 2008-2019.**
+*  **Louisville's VC scene is composed of a higher number of smaller deals than the average peer city.**
+*  **Louisville receives a higher-than-average percent of VC dollars from in-state, but Louisville has a smaller-than-average percent of VC deals from in-state investors. In-state deals are larger than deals from out-of-state, on average.**
+
+```{r setup}
+library(tidyr)
+library(readr)
+library(dplyr)
+library(stringr)
+library(magrittr)
+library(glptools)
+
+library(broom)
+library(purrr)
+
+library(feather)
+library(classInt)
+library(scales)
+library(ggplot2)
+library(ggthemes)
+library(ggrepel)
+
+library(showtext)
+showtext_auto()
+setwd("../..")
+font_add("Museo Sans 300", "MuseoSans_300.otf")
+font_add("Museo Sans 300 Italic", "MuseoSans_300_Italic.otf")
+
+```
+
+```{r data}
+for(c in unique(FIPS_df$city[FIPS_df$current == 1])){
+  df <- readxl::read_xlsx("data/Investments by City.xlsx",
+                          sheet = c, skip = 31, col_types = c("numeric", "numeric", "numeric"),
+                          col_names = c("year", "capital", "deals"))
+  
+  df$city <- c
+  
+  capital_all <- assign_row_join(capital_all, df)
+
+  
+  df <- readxl::read_xlsx("data/Investments by City with Investor Screen.xlsx", 
+                          sheet = c, skip = 31, col_types = c("numeric", "numeric", "numeric"),
+                          col_names = c("year", "capital_instate", "deals_instate"))
+  
+  df$city <- c
+  
+  capital_in_state <- assign_row_join(capital_in_state, df)
+}
+
+FIPS_df <- FIPS_df %>% filter(FIPS %not_in% c(29189, 29510))
+
+population_df_merged_2019 <- population_df_merged %>%
+  filter(year == 2018) %>%
+  mutate(year = 2019)
+
+population_df_merged_all <- bind_rows(population_df_merged, population_df_merged_2019)
+
+lou_population <- population_df_merged_all %>% 
+  filter(FIPS == 21111) %>% 
+  transmute(year, pop_lou = population)
+
+MSA_pop <- glpdata:::population %>% select(FIPS, year, core_county_pct)
+MSA_pop_18 <- MSA_pop %>% filter(year == 2017) %>% mutate(year = 2018)
+MSA_pop_19 <- MSA_pop %>% filter(year == 2017) %>% mutate(year = 2019)
+MSA_pop %<>% bind_rows(MSA_pop_18, MSA_pop_19)
+MSA_pop %<>% 
+  left_join(population_df_merged_all, by = c("FIPS", "year")) %>%
+  mutate(MSA_pop = population * 100 / core_county_pct) %>%
+  select(FIPS, year, MSA_pop)
+
+MSA_lou_pop <- MSA_pop %>%
+  filter(FIPS == 21111) %>%
+  transmute(year, lou_MSA_pop = MSA_pop)
+
+capital <- full_join(capital_all, capital_in_state, by = c("year", "city")) %>%
+  rbind(c(2008, 0, 0, unname(as.list("Greensboro")), 0, 0))  %>%
+  left_join(FIPS_df, by = "city") %>%
+  left_join(population_df_merged_all, by = c("FIPS", "year")) %>%
+  left_join(lou_population, by = "year") %>%
+  left_join(MSA_pop, by = c("FIPS", "year")) %>%
+  left_join(MSA_lou_pop, by = "year") %>%
+  mutate_at(vars(capital, capital_instate, deals, deals_instate), replace_na, 0) %>%
+  mutate(
+    capital_outstate = capital - capital_instate,
+    deals_outstate = deals - deals_instate) %>%
+  transmute(
+    FIPS, year, MSA_pop,
+    capital = capital * 1000000,
+    capital_outstate = capital_outstate * 1000000,
+    
+    capital_pp = capital / MSA_pop,
+    capital_outstate_pp = capital_outstate / MSA_pop,
+    
+    deals, deals_outstate,
+    
+    deals_pp = deals / MSA_pop,
+    deals_outstate_pp = deals_outstate / MSA_pop,
+    deal_size = capital / deals) %>%
+  COLA(capital:capital_outstate_pp, base_year = 2019, rpp = FALSE) %>%
+  organize()
+```
+
+```{r graphs}
+showtext_auto()
+
+graph_df <- data.frame(
+  variable = names(capital)[4:12],
+  title = c("VC Investment", "Out-of-State VC Investment", 
+            "VC Investment per capita", "Out-of-State VC Investment per capita",
+            "VC Deals", "Out-of-State VC Deals",
+            "VC Deals per million residents", "Out-of-State VC Deals per million residents",
+            "VC Deal Size"),
+  y_axis = c(rep("Dollars", 4), rep("Deals", 4), "Dollars"),
+  axis_3 = c(9, 8, 15, 15, 17, 18, 18, 18, 18),
+  axis_all = c(11, 11, 16, 17, 18, 18, 18, 18, 18),
+  per_capita = c(F, F, T, T, F, F, T, T, F),
+  single_year = c(F, F, F, F, T, T, T, T, F),
+  stringsAsFactors = FALSE)
+  
+for(r in 1:nrow(graph_df)){
+  g <- graph_df[r,]
+  
+  print(g$variable)
+  
+  if (g$y_axis == "Deals") {
+    if (g$per_capita) {
+      label_fxn <- comma_format(accuracy = 0.1, scale = 1000000)
+      axis_fxn  <- comma_format(accuracy = 1, scale = 1000000)
+    } else {
+      label_fxn <- comma_format(accuracy = 0.1, scale = 1)
+      axis_fxn  <- comma_format(accuracy = 1, scale = 1)
+    }
+  } else if (g$y_axis == "Dollars"){
+    if (g$per_capita) {
+      label_fxn <- dollar_format(accuracy = 0.1, scale = 1)
+      axis_fxn  <- dollar_format(accuracy = 1, scale = 1)
+    } else {
+      label_fxn <- dollar_format(accuracy = 0.1, scale = .000001, suffix = "M")
+      axis_fxn  <- dollar_format(accuracy = 1, scale = .000001, suffix = "M")
+    }
+  } else {
+    label_fxn <- NULL
+    axis_fxn  <- NULL
+  }
+  
+  if (g$y_axis == "Dollars") subtitle <- "Adjusted for inflation" else subtitle <- ""
+  
+  if (g$single_year) {
+    png("images/" %p% g$variable %p% "_ranking.png", 3000, 2400, res = 200)
+    p <- ranking(capital, g$variable, 2018, plot_title = g$title %p% ", 2018",
+                 y_title = g$y_axis, 
+                 subtitle_text = subtitle, caption_text = "GLP analysis of PitchBook data",
+                 alternate_text = g$axis_3:17, label_function = label_fxn, sigfig = 4)
+    print(p)
+    dev.off()
+  } else {
+    png("images/" %p% g$variable %p% "_ranking_3.png", 3000, 2400, res = 200)
+    p <- ranking(capital, g$variable, 2017:2019, plot_title = g$title %p% ", 2017-2019 Average",
+                 y_title = g$y_axis, 
+                 subtitle_text = subtitle, caption_text = "GLP analysis of PitchBook data",
+                 alternate_text = g$axis_3:17, label_function = label_fxn, sigfig = 4)
+    print(p)
+    dev.off()
+  }
+  
+  png("images/" %p% g$variable %p% "_ranking_all.png", 3000, 2400, res = 200)
+  p <- ranking(capital, g$variable, 2008:2019, plot_title = g$title %p% ", 2008-2019 Average", 
+               y_title = g$y_axis, 
+               subtitle_text = subtitle, caption_text = "GLP analysis of PitchBook data",
+               alternate_text = g$axis_all:17, label_function = label_fxn, sigfig = 4)
+  print(p)
+  dev.off()
+  
+  png("images/" %p% g$variable %p% "_trendline.png", 3000, 2400, res = 200)
+  p <- trend(capital, g$variable, plot_title = g$title, y_title = g$y_axis, 
+             subtitle_text = subtitle, caption_text = "GLP analysis of PitchBook data",
+             label_function = label_fxn,
+             axis_function = axis_fxn)
+  print(p)
+  dev.off()
+  
+  png("images/" %p% g$variable %p% "_trendline_3yr.png", 3000, 2400, res = 200)
+  p <- trend(capital, g$variable, plot_title = g$title, y_title = g$y_axis, 
+             subtitle_text = subtitle, caption_text = "GLP analysis of PitchBook data",
+             rollmean = 3,
+             label_function = label_fxn,
+             axis_function = axis_fxn)
+  print(p)
+  dev.off()
+}
+```
+
+```{r capital_pop_relationship}
+capital_avg_3yr <- capital %>%
+  filter(year %in% 2017:2019) %>%
+  group_by(FIPS) %>%
+  summarise_at(vars(MSA_pop:deal_size), mean) %>%
+  pull_peers_FIPS()
+
+capital_avg <- capital %>%
+  group_by(FIPS) %>%
+  summarise_at(vars(MSA_pop:deal_size), mean) %>%
+  pull_peers_FIPS()
+
+png("images/investment_population_3yr.png", 3000, 2400, res = 200)
+g <- ggplot(capital_avg_3yr, aes(x = MSA_pop, y = capital_pp, label = city)) +
+  geom_point(size = 5) + 
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(labels = comma_format()) +
+  scale_y_continuous(labels = dollar_format()) +
+  geom_text_repel(size = 16, family = "Museo Sans 300")
+
+g %<>% glptools:::tl_style(
+  plot_title = "VC investment per capita and population, 2017-2019 Averages",
+  y_title = "Average VC investment per capita",
+  x_title = "Average Population",
+  caption_text = "",
+  subtitle_text = "",
+  cat_names = "")
+print(g)
+dev.off()
+
+
+png("images/investment_population.png", 3000, 2400, res = 200)
+g <- ggplot(capital_avg, aes(x = MSA_pop, y = capital_pp, label = city)) +
+  geom_point(size = 5) + 
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(labels = comma_format()) +
+  scale_y_continuous(labels = dollar_format()) +
+  geom_text_repel(size = 16, family = "Museo Sans 300")
+
+g %<>% glptools:::tl_style(
+  plot_title = "VC investment per capita and population, 2008-2019 Average",
+  y_title = "Average VC investment per capita",
+  x_title = "Average Population",
+  caption_text = "",
+  subtitle_text = "",
+  cat_names = "")
+print(g)
+dev.off()
+```
+
+```{r outstate_percent}
+capital %<>% mutate(ratio = capital_outstate / capital * 100)
+capital_avg %<>% mutate(ratio = capital_outstate / capital * 100)
+capital_avg_3yr %<>% mutate(ratio = capital_outstate / capital * 100)
+
+png("images/outstate_ratio_3.png", 3000, 2400, res = 200)
+p <- ranking(capital_avg_3yr, "ratio", 
+             plot_title = "Percent of VC from Out-of-State, 2017-2019",
+             subtitle_text = "Adjusted for inflation", 
+             caption_text = "GLP analysis of PitchBook data")
+print(p)
+dev.off()
+
+png("images/outstate_ratio_all.png", 3000, 2400, res = 200)
+p <- ranking(capital_avg, "ratio", 
+             plot_title = "Percent of VC from Out-of-State, 2008-2019",
+             subtitle_text = "Adjusted for inflation", 
+             caption_text = "GLP analysis of PitchBook data")
+print(p)
+dev.off()
+
+png("images/outstate_ratio_trendline_3yr.png", 3000, 2400, res = 200)
+p <- trend(capital, ratio, plot_title = "Percent of VC from Out-of-state", rollmean = 3,
+           subtitle_text = "Adjusted for inflation", caption_text = "GLP analysis of PitchBook data")
+print(p)
+dev.off()
+
+png("images/outstate_ratio_trendline_all.png", 3000, 2400, res = 200)
+p <- trend(capital, ratio, plot_title = "Percent of VC from Out-of-state",
+           subtitle_text = "Adjusted for inflation", caption_text = "GLP analysis of PitchBook data")
+print(p)
+dev.off()
+```
+

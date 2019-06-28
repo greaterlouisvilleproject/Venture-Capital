@@ -1,0 +1,311 @@
+---
+title: "Exploring Venture Capital in Louisville"
+output: html_document
+---
+
+<style type="text/css">
+h1 {
+  text-align: center;
+}
+h1,h2,h3,h4,h5,h6 {
+  font-family: "Museo Sans 300";
+}
+body{
+  font-family: "Museo Sans 300";
+  font-size: 15px;
+}
+</style>
+
+**These graphs explore Venture Capital investment in Louisville between 2008 and 2019 based on data from Pitchbook. You can toggle between different ways of adjusting the data to see different years, unadjusted data, etc. The defaults tell the story best, so you can scroll through and get the whole picture without toggling.**  
+
+
+<br>
+
+***
+
+<br>
+
+# Raw data 
+
+These graphs show the raw amount of venture capital investment in Louisville compared to peer cities without any other adjustments.
+  
+Note: Since we're only partway through 2019, investment ticks down for that year in most of our peer cities. Normally I would remove 2019, but since it is an important year for an accurate picture of Louisville's VC, I left it in.
+
+**Louisville has generally seen low levels of VC investment compared to peer cities, though there was much more VC investment activity in 2010, 2018 and 2019. The data should be adjusted for population for better analysis, though.** 
+
+![](images/capital_ranking_all.png){width=80%}
+
+![](images/capital_trendline.png){width=80%}
+
+<br>
+
+***
+
+<br>
+
+# Venture Capital Dollars
+These graphs are adjusted for the population size of each city. 
+
+*  The **Per capita** graphs show VC investment per person.  
+*  The **Unadjusted** graphs show the raw values.
+
+
+## Ranking {.tabset}
+**Adjusting for population (using the MSA population), Louisville moves up in the rankings over every timespan. Louisville is in the middle of the pack over 2008-2019 and 2017-2019.**
+
+### 2008-2019 {.tabset}
+
+#### Per capita
+![](images/capital_pp_ranking_all.png){width=80%}
+
+#### Unadjusted
+![](images/capital_ranking_all.png){width=80%}
+
+### 2017-2019 {.tabset}
+
+#### Per capita
+![](images/capital_pp_ranking_3.png){width=80%}
+
+#### Unadjusted
+![](images/capital_ranking_3.png){width=80%}
+
+## Trendline {.tabset}
+
+**Louisville tends to rank slightly above the 25th percentile of peer cities, with occasional large deals sending us much higher.**
+
+### 1-year data {.tabset}
+
+#### Unadjusted 
+![](images/capital_trendline.png){width=80%}
+
+#### Per capita
+![](images/capital_pp_trendline.png){width=80%}
+
+### 3-year data {.tabset .active}
+
+#### Per capita {.active}
+![](images/capital_pp_trendline_3yr.png){width=80%}
+
+#### Unadjusted
+![](images/capital_trendline_3yr.png){width=80%}
+
+
+
+## Note: City size and VC Investment {.tabset}
+Money follows money: larger cities attract more venture capital, even after adjusting for population. You would expect a city twice the size of Louisville to attract *more* than twice the amount of venture capital. These graphs compare average *scaled* VC investment with population.
+
+The data is adjusted for population, so if all cities had the same investment per capita, they would be on a horizontal line. The blue line is a regression line showing the actual relationship based on the data.  
+
+**Louisville performs about average from 2008 to 2019 and better than we would expect from 2017-2019. Between 2008 and 2019, with the exception of Memphis, every city smaller than Louisville had lower VC investment per capita, and every city larger than Louisville had higher VC investment per capita. We are right where we would expect to be. We're outperforming our peers when you look at 2017-2019.**
+
+### 2008-2019 {.active}
+![](images/investment_population.png){width=80%}
+
+<br>
+
+***
+
+<br>
+
+### 2017-2019
+![](images/investment_population_3yr.png){width=80%}
+
+<br>
+
+***
+
+<br>
+
+
+# VC Deals and Deal Size
+
+**An average of 21.4 VC deals ocurred annually in Louisville fom 2008-2019. This section adjusts the data for population size and explores the average size of VC deals.**
+
+![](images/deals_ranking_all.png){width=80%}
+
+## Number of Deals
+
+### Ranking {.tabset}
+
+**Louisville ranks fairly high in terms of number of VC deals.**
+
+#### 2008-2019 {.tabset}
+
+##### Per capita
+![](images/deals_pp_ranking_all.png){width=80%}
+
+##### Unadjusted
+![](images/deals_ranking_all.png){width=80%}
+
+#### 2018 {.tabset}
+
+##### Per capita
+![](images/deals_ranking.png){width=80%}
+
+##### Unadjusted
+![](images/deals_pp_ranking.png){width=80%}
+
+### Trendline {.tabset}
+
+**The number of VC deals in Louisville has increased past the peer average since 2015.**
+
+#### 1-year {.tabset}
+
+##### Per capita
+![](images/deals_pp_trendline.png){width=80%}
+
+##### Unadjusted
+![](images/deals_trendline.png){width=80%}
+
+
+#### 3-year {.tabset .active}
+
+##### Per capita
+![](images/deals_pp_trendline_3yr.png){width=80%}
+
+##### Unadjusted
+![](images/deals_trendline_3yr.png){width=80%}
+
+
+## Size of Deals
+
+**Compared to our peer cities, Louisville is toward the middle of the pack in terms of deal size. This is largely due to  a very high data point in 2019—Louisville is much lower in the overall dataset.**
+
+### Ranking {.tabset}
+
+#### 2008-2019
+![](images/deal_size_ranking_all.png){width=80%}
+
+#### 2017-2019
+![](images/deal_size_ranking_3.png){width=80%}
+
+### Trendline {.tabset}
+
+**With the exception of 2019, Louisville has tended to hover around the 25th percentile of deal size.**
+
+#### 1-year
+![](images/deal_size_trendline.png){width=80%}
+
+<br>
+
+***
+
+<br>
+
+#### 3-year
+![](images/deal_size_trendline_3yr.png){width=80%}
+
+<br>
+
+***
+
+<br>
+
+
+
+# Out-of-state Venture Capital 
+**These graphs are similar to the previous section, though the data is restricted to venture capital from out-of-state sources, i.e. How much of or VC investment is attracted from other parts of the country?**
+
+## Pecent of Capital Dollars from out-of-state {.tabset}
+
+**Louisville sees a lower-than-average proportion of VC dollars come from out-of-state. Because a higher percentage could be due to more dollars coming from out-of-state or fewer dollars coming from in-state, it is better to look at the actual dollar amount in the next section.** 
+
+### Ranking {.tabset}
+
+#### 2008-2019
+![](images/outstate_ratio_all.png){width=80%}
+
+#### 2017-2019
+![](images/outstate_ratio_3.png){width=80%}
+
+### Trendline {.tabset}
+
+#### 1-year
+![](images/outstate_ratio_trendline_all.png){width=80%}
+
+#### 3-year {.active}
+![](images/outstate_ratio_trendline_3yr.png){width=80%}
+
+## Dollars from out-of-state {.active}
+
+Louisville sees a slighlty lower-than-average proportion of VC dollars come from out-of-state. We would be much lower were it not for 2010, however.
+
+### Ranking {.tabset .active}
+
+#### 2008-2019 {.tabset .active}
+
+##### Per capita
+![](images/capital_outstate_pp_ranking_all.png){width=80%}
+
+##### Unadjusted
+![](images/capital_outstate_ranking_all.png){width=80%}
+
+
+#### 2017-2019 {.tabset}
+
+##### Per capita
+![](images/capital_outstate_pp_ranking_3.png){width=80%}
+
+##### Unadjusted
+![](images/capital_outstate_ranking_3.png){width=80%}
+
+### Trendline {.tabset}
+
+#### 1-year {.tabset}
+
+##### Per capita
+![](images/capital_outstate_pp_trendline.png){width=80%}
+
+##### Unadjusted
+![](images/capital_outstate_trendline.png){width=80%}
+
+#### 3-year {.tabset .active}
+
+##### Per capita
+![](images/capital_outstate_pp_trendline_3yr.png){width=80%}
+
+##### Unadjusted
+![](images/capital_outstate_trendline_3yr.png){width=80%}
+
+## Deals from out-of-state
+
+Louisville sees a very large number of out-of-state VC deals. In conjunction with the last section, this shows that Louisville generally sees a large number of small investments from out-of-state, and a smaller number of large investments from in-state.
+
+### Ranking {.tabset}
+
+#### 2008-2019 {.tabset .active}
+
+##### Per capita
+![](images/deals_outstate_pp_ranking_all.png){width=80%}
+
+##### Unadjusted
+![](images/deals_outstate_ranking_all.png){width=80%}
+
+#### 2018 {.tabset}
+
+##### Per capita
+![](images/deals_outstate_pp_ranking.png){width=80%}
+
+##### Unadjusted
+![](images/deals_outstate_ranking.png){width=80%}
+
+### Trendline {.tabset}
+
+#### 1-year {.tabset}
+
+##### Per capita
+![](images/deals_outstate_pp_trendline.png){width=80%}
+
+##### Unadjusted
+![](images/deals_outstate_trendline.png){width=80%}
+
+#### 3-year {.tabset .active}
+
+##### Per capita
+![](images/deals_outstate_pp_trendline_3yr.png){width=80%}
+
+##### Unadjusted
+![](images/deals_outstate_trendline_3yr.png){width=80%}
+
+
+
