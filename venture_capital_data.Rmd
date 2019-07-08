@@ -221,7 +221,7 @@ g <- ggplot(capital_avg_3yr, aes(x = MSA_pop, y = capital_pp, label = city)) +
   geom_text_repel(size = 16, family = "Museo Sans 300")
 
 g %<>% glptools:::tl_style(
-  plot_title = "VC investment per capita and population, 2017-2019 Averages",
+  plot_title = "VC investment per capita and population, 2017-2019 Average",
   y_title = "Average VC investment per capita",
   x_title = "Average Population",
   caption_text = "",
