@@ -99,7 +99,7 @@ The data is adjusted for population, so if all cities had the same investment pe
 **Louisville performs about average from 2008 to 2019 and better than we would expect from 2017-2019. Between 2008 and 2019, with the exception of Memphis, every city smaller than Louisville had lower VC investment per capita, and every city larger than Louisville had higher VC investment per capita. We are right where we would expect to be. We're outperforming our peers when you look at 2017-2019.**
 
 ### 2008-2019 {.active}
-![](images/investment_population.png){width=80%}
+![](investment_population.png){width=80%}
 
 <br>
 
@@ -108,7 +108,7 @@ The data is adjusted for population, so if all cities had the same investment pe
 <br>
 
 ### 2017-2019
-![](images/investment_population_3yr.png){width=80%}
+![](ages/investment_population_3yr.png){width=80%}
 
 <br>
 
