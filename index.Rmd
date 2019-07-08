@@ -108,7 +108,7 @@ The data is adjusted for population, so if all cities had the same investment pe
 <br>
 
 ### 2017-2019
-![](ages/investment_population_3yr.png){width=80%}
+![](investment_population_3yr.png){width=80%}
 
 <br>
 
